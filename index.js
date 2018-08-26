@@ -18,6 +18,7 @@ function parse(hashrateString) {
 	unit = unit.replace('H/s', '').trim();
 
 	const unitValue = {
+		H: '1',
 		K: '1000',
 		M: '1000000',
 		G: '1000000000',
