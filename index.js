@@ -2,7 +2,7 @@ const Bignumber = require('bignumber.js');
 const Math = require('mathjs');
 
 function toString(hashrate){
-	return valueToMagnitude(hashrate, 'H/s', 10);
+	return valueToMagnitude(hashrate, 'H/s', 2);
 }
 
 function parse(hashrateString) {
@@ -53,7 +53,7 @@ function valueToMagnitude(value, unit, fixedPlaces) {
 	value = value / Math.pow(10, unitExponents[idx][0]);
 
 	if (fixedPlaces !== undefined) {
-		value = Math.tofixed(value, fixedPlaces);
+		value = value.toFixed(fixedPlaces);
 	}
 
 	value = value * sign;
@@ -93,7 +93,7 @@ function valueToMagnitudeVerySmall(value, unit, fixedPlaces) {
 	valueBG = valueBG.div(new Big(10).pow(unitExponents[idx][0]));
 
 	if (fixedPlaces !== undefined) {
-		valueBG = value.tofixed(fixedPlaces);
+		valueBG = value.toFixed(fixedPlaces);
 	}
 	valueBG = valueBG.times(sign);
 	return valueBG + ' ' + unitExponents[idx][1] + unit;
