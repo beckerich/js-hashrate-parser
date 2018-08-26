@@ -1,14 +1,8 @@
 const Bignumber = require('bignumber.js');
+const Math = require('mathjs');
 
 function toString(hashrate){
-	hashrate = (hashrate * 2);
-	if (hashrate < 1000000) {
-		return (Math.round(hashrate / 1000) / 1000 ).toFixed(0)+' H/s';
-	}
-	var byteUnits = [ ' H/s', ' KH/s', ' MH/s', ' GH/s', ' TH/s', ' PH/s' ];
-	var i = Math.floor((Math.log(hashrate/1000) / Math.log(1000)) - 1);
-	hashrate = (hashrate/1000) / Math.pow(1000, i + 1);
-	return hashrate.toFixed(0) + byteUnits[i];
+	return valueToMagnitude(hashrate, 'H/s', 10);
 }
 
 function parse(hashrateString) {
@@ -28,6 +22,81 @@ function parse(hashrateString) {
 	}
 
 	return new Bignumber(value).times(unitValue[unit] || 0);
+}
+
+function valueToMagnitude(value, unit, fixedPlaces) {
+	var unitExponents = [
+		[0, ''],
+		[3, 'k'],
+		[6, 'M'],
+		[9, 'G'],
+		[12, 'T'],
+		[15, 'P'],
+		[18, 'E'],
+		[21, 'Y']
+	];
+
+	if (Math.abs(value) > 0 && Math.abs(value) < 1) {
+		return valueToMagnitudeVerySmall(value, unit, fixedPlaces);
+	}
+
+	var sign = value < 0 ? -1 : 1;
+	value = Math.abs(value);
+	var i = 0;
+	let idx = 0;
+	for (i = unitExponents.length - 1; i >= 0; i--) {
+		if (value >= Math.pow(10, unitExponents[i][0])) {
+			idx = i;
+			break;
+		}
+	}
+	value = value / Math.pow(10, unitExponents[idx][0]);
+
+	if (fixedPlaces !== undefined) {
+		value = Math.tofixed(value, fixedPlaces);
+	}
+
+	value = value * sign;
+
+	return value + ' ' + unitExponents[idx][1] + unit;
+}
+
+function valueToMagnitudeVerySmall(value, unit, fixedPlaces) {
+	var unitExponents = [
+		[-12, 'p'],
+		[-9, 'n'],
+		[-6, 'μ'],
+		[-3, 'm'],
+		[0, ''],
+		[3, 'k'],
+		[6, 'M'],
+		[9, 'G'],
+		[12, 'T'],
+		[15, 'P'],
+		[18, 'E'],
+		[21, 'Y']
+	];
+	var valueBG = new Big(value);
+	var sign = valueBG.lt(0) ? -1 : 1;
+	valueBG = valueBG.abs(valueBG);
+
+	var i = 0;
+	let idx = unitExponents.length - 1;
+	match = false;
+	for (i = 0; i < unitExponents.length; i++) {
+		if (valueBG.lte(new Big(10).pow(unitExponents[i][0]))) {
+			idx = i;
+			break;
+		}
+	}
+
+	valueBG = valueBG.div(new Big(10).pow(unitExponents[idx][0]));
+
+	if (fixedPlaces !== undefined) {
+		valueBG = value.tofixed(fixedPlaces);
+	}
+	valueBG = valueBG.times(sign);
+	return valueBG + ' ' + unitExponents[idx][1] + unit;
 }
 
 module.exports = { parse, toString };
