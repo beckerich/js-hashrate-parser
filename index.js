@@ -15,19 +15,19 @@ function parse(hashrateString) {
 	const value = hashrateString.slice(0, hashrateString.indexOf(' '));
 	let unit = hashrateString.slice(hashrateString.indexOf(' '), hashrateString.length);
 	unit = unit.replace('Sol', 'H');
-	unit = unit.replace('H/s', '').trim();
+	unit = unit.replace('/s', '').trim();
 
 	const unitValue = {
 		H: '1',
-		K: '1000',
-		M: '1000000',
-		G: '1000000000',
-		T: '1000000000000',
-		P: '1000000000000000',
-		E: '1000000000000000000'
+		KH: '1000',
+		MH: '1000000',
+		GH: '1000000000',
+		TH: '1000000000000',
+		PH: '1000000000000000',
+		EH: '1000000000000000000'
 	}
 
-	return new Bignumber(value).times(unitValue[unit]);
+	return new Bignumber(value).times(unitValue[unit] || 0);
 }
 
 module.exports = { parse, toString };
