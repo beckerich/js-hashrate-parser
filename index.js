@@ -2,7 +2,7 @@ const Bignumber = require('bignumber.js');
 const Math = require('mathjs');
 
 function toString(hashrate){
-	return valueToMagnitude(hashrate, 'H/s', 2);
+	return valueToMagnitude(new Bignumber(hashrate).toNumber(), 'H/s', 2);
 }
 
 function parse(hashrateString) {
