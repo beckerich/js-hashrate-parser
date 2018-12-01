@@ -1,8 +1,8 @@
 const Bignumber = require('bignumber.js');
 const Math = require('mathjs');
 
-function toString(hashrate){
-	return valueToMagnitude(new Bignumber(hashrate).toNumber(), 'H/s', 2);
+function toString(hashrate, as){
+	return valueToMagnitude(new Bignumber(hashrate).toNumber(), 'H/s', 2, as);
 }
 
 function parse(hashrateString) {
@@ -24,7 +24,7 @@ function parse(hashrateString) {
 	return new Bignumber(value).times(unitValue[unit] || 0);
 }
 
-function valueToMagnitude(value, unit, fixedPlaces) {
+function valueToMagnitude(value, unit, fixedPlaces, as) {
 	var unitExponents = [
 		[0, ''],
 		[3, 'k'],
@@ -50,6 +50,16 @@ function valueToMagnitude(value, unit, fixedPlaces) {
 			break;
 		}
 	}
+
+	if (as) {
+		unitExponents.map((e, index) => {
+			if (e[1] === as) {
+				idx = index;
+			}
+		});
+	}
+
+
 	value = value / Math.pow(10, unitExponents[idx][0]);
 
 	if (fixedPlaces !== undefined) {
